@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Notes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- Left Panel (form to add notes) -->
+        <div class="left-panel">
+            <h1>My Notes</h1>
+            <form action="/add" method="POST">
+                <input type="text" name="title" placeholder="Enter title" required>  <!-- Title input -->
+                <textarea name="desc" placeholder="Enter description" required></textarea>  <!-- Description input -->
+                <button type="submit">Add Note</button>
+            </form>
+        </div>
+
+        <!-- Right Panel (display notes) -->
+        <div class="right-panel">
+            <ul>
+                {% for note in notes %}
+                    <li class="note-item">
+                        <div class="note-title">
+                            <strong>{{ note.title }}</strong>
+                            <button class="toggle-description">▼</button>
+                        </div>
+                        <div class="note-description" style="display: none;">
+                            <p>{{ note.desc }}</p>
+                        </div>
+
+                        <!-- Edit and Delete buttons -->
+                        <a href="/delete/{{ note.id }}"><button class="delete-btn">Delete</button></a>
+
+                        <!-- Edit form, hidden initially -->
+                        <form class="edit-form" action="/update/{{ note.id }}" method="POST" style="display: none;">
+                            <input type="text" name="title" value="{{ note.title }}" required>
+                            <textarea name="desc" required>{{ note.desc }}</textarea>
+                            <button type="submit">Update</button>
+                        </form>
+                        <!-- Toggle the display of the edit form -->
+                        <button class="edit-btn">Edit</button>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Toggle description on title click
+        document.querySelectorAll('.toggle-description').forEach(function(button) {
+            button.addEventListener('click', function() {
+                const description = this.closest('.note-item').querySelector('.note-description');
+                description.style.display = (description.style.display === 'none' || description.style.display === '') ? 'block' : 'none';
+                this.textContent = description.style.display === 'block' ? '▲' : '▼';
+            });
+        });
+
+        // Edit button functionality
+        document.querySelectorAll('.edit-btn').forEach(function(button) {
+            button.addEventListener('click', function() {
+                const editForm = this.closest('.note-item').querySelector('.edit-form');
+                const isHidden = editForm.style.display === 'none' || editForm.style.display === '';
+                editForm.style.display = isHidden ? 'block' : 'none';
+            });
+        });
+    </script>
+</body>
+</html>
